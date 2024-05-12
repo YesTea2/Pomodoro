@@ -4,10 +4,13 @@ rootFrame = []
 currentlyDisplayedMainFrame = []
 currentlyDisplayedTimerLabel = []
 currentlyDisplayedTopButtons = []
-currentlyDisplayedButtonFrame = []
+currentlyDisplayedButtonTopFrame = []
+currentlyDisplayedButtonBottomFrame = []
 currentlyDisplayedBottomButton = []
 currentlyDisplayedChoiceFrame = []
 currentlyDisplayedTimeDropdown = []
+currentlyDisplayedNestedBottomFrame = []
+currentlyDisplayedMainButtonFrame = []
 currentTimer = []
 
 currentPomodorMaxTime = 1800
@@ -15,6 +18,8 @@ currentLongBreakMaxTime = 600
 currentShortBreakMaxTime = 300
 
 isPaused = True
+
+isDropDownOpen = False
 
 isUpdatingPomodorTime = False
 isUpdatingLongBreakTime = False
@@ -34,6 +39,21 @@ class Timer:
         self.isSetToLongBreakTime = False
         self.isSetToShortBreakTime = False
     
+    def ChangeTimerType(self, timerType:str):
+        if timerType.lower() == "l":
+            self.isSetToLongBreakTime = True
+            self.isSetToShortBreakTime = False
+            self.isSetToPomodoroTime = False
+        elif timerType.lower() =="s":
+            self.isSetToShortBreakTime = True
+            self.isSetToPomodoroTime = False
+            self.isSetToLongBreakTime = False
+        else:
+            self.isSetToPomodoroTime = True
+            self.isSetToLongBreakTime = False
+            self.isSetToShortBreakTime = False
+            
+            
     def StartTimer(self):
         self.isPaused = False
         if self.isSetToPomodoroTime == True:
@@ -141,29 +161,55 @@ def CreateMainFrame():
     mainFrame.configure(fg_color="#03071e")
     currentlyDisplayedMainFrame.clear()
     currentlyDisplayedMainFrame.append(mainFrame)
+    
+def CreateMainButtonFrame():
+    mainButtonFrame = customtkinter.CTkFrame(master=currentlyDisplayedMainFrame[0])
+    mainButtonFrame.pack(fill="both", expand=False)
+    mainButtonFrame.configure(fg_color="#03071e")
+    currentlyDisplayedMainButtonFrame.clear()
+    currentlyDisplayedMainButtonFrame.append(mainButtonFrame)
+     
 
 def CreateTimerLabel():
-    timerLabel = customtkinter.CTkLabel(master=currentlyDisplayedMainFrame[0], text=currentTimer[0].ReturnPomodoroTime(), font=("Great Vibes", 200))
-    timerLabel.pack(padx=(25, 20), pady=(100, 5))
+    timerLabel = customtkinter.CTkLabel(master=currentlyDisplayedMainFrame[0], text=currentTimer[0].ReturnPomodoroTime(), font=("Great Vibes", 175))
+    timerLabel.pack(padx=(25, 20), pady=(40, 5))
     currentlyDisplayedTimerLabel.clear()
     currentlyDisplayedTimerLabel.append(timerLabel)
 
 def CreateTopMenu():
-    CreateButtonFrame()
+    CreateTopButtonFrame()
+    CreateTopLabel()
     CreateTopButtons()
+    
+def CreateTopLabel():
+    topLabel = customtkinter.CTkLabel(master=currentlyDisplayedButtonTopFrame[0], text="SETTINGS", font=("Great Vibes", 40))
+    topLabel.pack(pady=0,padx=60)
+
 
             
-def CreateButtonFrame():
+def CreateTopButtonFrame():
     frame = customtkinter.CTkFrame(master=currentlyDisplayedMainFrame[0], height=100, fg_color="transparent")
-    frame.pack(pady=20,padx=60, side="top", fill="x", expand=False)
-    currentlyDisplayedButtonFrame.clear()
-    currentlyDisplayedButtonFrame.append(frame)
+    frame.pack(pady=(20,40),padx=60, side="top", fill="x", expand=False)
+    currentlyDisplayedButtonTopFrame.clear()
+    currentlyDisplayedButtonTopFrame.append(frame)
     
 def CreateChoiceFrame():
     frame = customtkinter.CTkFrame(master=currentlyDisplayedMainFrame[0], height=50, fg_color="transparent")
     frame.pack(pady=(10,0),padx=60, side="top", expand=False)
     currentlyDisplayedChoiceFrame.clear()
     currentlyDisplayedChoiceFrame.append(frame)
+    
+def CreateBottomButtonFrame():
+    frame = customtkinter.CTkFrame(master=currentlyDisplayedMainButtonFrame[0], height=100, fg_color="transparent")
+    frame.pack(pady=20,padx=60, side="bottom", fill="x", expand=False)
+    currentlyDisplayedButtonBottomFrame.clear()
+    currentlyDisplayedButtonBottomFrame.append(frame)
+    
+def CreateNestedBottomButtonFrame():
+    frame = customtkinter.CTkFrame(master=currentlyDisplayedButtonBottomFrame[0], height=100, fg_color="transparent")
+    frame.pack(pady=20,padx=60, side="bottom", fill="x", expand=False)
+    currentlyDisplayedNestedBottomFrame.clear()
+    currentlyDisplayedNestedBottomFrame.append(frame)
 
 def ButtonClicked():
     print("Button clicked")
@@ -262,9 +308,11 @@ def optionmenu_callback(choice):
 
 
 def ClearDropdown():
+    global isDropDownOpen
     for dropdown in currentlyDisplayedTimeDropdown:
         dropdown.destroy()
     currentlyDisplayedTimeDropdown.clear()
+    isDropDownOpen = False
     ResetBottomButtons()
     
 def ToggleButtonTypeBoolsOff():
@@ -275,43 +323,46 @@ def ToggleButtonTypeBoolsOff():
     isUpdatingPomodorTime = False
 
 def TimeOptionClicked(buttonType:str):
-    global isUpdatingLongBreakTime, isUpdatingPomodorTime, isUpdatingShortBreakTime
-    RemoveBottomButtons()
+    global isUpdatingLongBreakTime, isUpdatingPomodorTime, isUpdatingShortBreakTime, isDropDownOpen
+    if isDropDownOpen == True:
+        return
+    else:
+        isDropDownOpen = True
+        RemoveBottomButtons()
 
-    
-    if buttonType == "p":
-
-        isUpdatingPomodorTime = True
-    if buttonType =="l":
-        isUpdatingLongBreakTime = True
-    if buttonType =="s":
-        isUpdatingShortBreakTime = True
         
-    optionMenuVar = customtkinter.StringVar(value="30 Min")
-    optionMenu = customtkinter.CTkOptionMenu(currentlyDisplayedMainFrame[0],values=["1 Hr","45 Min","30 Min","15 Min","5 Min"],
-                                            command=optionmenu_callback,
-                                            variable=optionMenuVar,
-                                            height= 50,
-                                            width = 500,
-                                            fg_color="#9d0208",
-                                            dropdown_fg_color="#9d0208",
-                                            dropdown_font=("Great Vibes", 50),
-                                            dropdown_hover_color="#370617",
-                                            button_color="#370617",
-                                            button_hover_color="#370617",
-                                            font=("Great Vibes", 50)
-)
-    optionMenu.pack(side="bottom", pady=(50, 125), padx=90)
-    currentlyDisplayedTimeDropdown.append(optionMenu)
+        if buttonType == "p":
+            isUpdatingPomodorTime = True
+        if buttonType =="l":
+            isUpdatingLongBreakTime = True
+        if buttonType =="s":
+            isUpdatingShortBreakTime = True
+            
+        optionMenuVar = customtkinter.StringVar(value="30 Min")
+        optionMenu = customtkinter.CTkOptionMenu(currentlyDisplayedMainButtonFrame[0],values=["1 Hr","45 Min","30 Min","15 Min","5 Min"],
+                                                command=optionmenu_callback,
+                                                variable=optionMenuVar,
+                                                height= 50,
+                                                width = 500,
+                                                fg_color="#9d0208",
+                                                dropdown_fg_color="#9d0208",
+                                                dropdown_font=("Great Vibes", 50),
+                                                dropdown_hover_color="#370617",
+                                                button_color="#370617",
+                                                button_hover_color="#370617",
+                                                font=("Great Vibes", 50)
+    )
+        optionMenu.pack(side="bottom", pady=(50, 0), padx=90)
+        currentlyDisplayedTimeDropdown.append(optionMenu)
 
 def CreateTopButtons():
-    buttonPomodoro = customtkinter.CTkButton(currentlyDisplayedButtonFrame[0], text="Pomodoro", font=("Great Vibes", 30), command=lambda option="p":TimeOptionClicked(option), border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+    buttonPomodoro = customtkinter.CTkButton(currentlyDisplayedButtonTopFrame[0], text="Pomodoro", font=("Great Vibes", 30), command=lambda option="p":TimeOptionClicked(option), border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
     buttonPomodoro.configure(height=75, width=200)
-    buttonPomodoro.pack(side="left", pady=12, padx=(275, 40))
-    buttonShortBreak = customtkinter.CTkButton(currentlyDisplayedButtonFrame[0], text="Short Break", font=("Great Vibes", 30), command=ButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+    buttonPomodoro.pack(side="left", pady=12, padx=(270, 40))
+    buttonShortBreak = customtkinter.CTkButton(currentlyDisplayedButtonTopFrame[0], text="Short Break", font=("Great Vibes", 30), command=lambda option="s":TimeOptionClicked(option), border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
     buttonShortBreak.configure(height=75, width=200)
     buttonShortBreak.pack(side="left", pady=12, padx=(20, 40))
-    buttonLongBreak = customtkinter.CTkButton(currentlyDisplayedButtonFrame[0], text="Long Break", font=("Great Vibes", 30), command=ButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+    buttonLongBreak = customtkinter.CTkButton(currentlyDisplayedButtonTopFrame[0], text="Long Break", font=("Great Vibes", 30), command=lambda option="l":TimeOptionClicked(option), border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
     buttonLongBreak.configure(height=75, width=200)
     buttonLongBreak.pack(side="left", pady=12, padx=20)
     currentlyDisplayedTopButtons.append(buttonPomodoro)
@@ -339,24 +390,56 @@ def ResetBottomButtons():
         button.destroy()
     currentlyDisplayedBottomButton.clear()
     CreateBottomButton()
+    CreateNestedBottomButtons()
     
 def RemoveBottomButtons():
     for button in currentlyDisplayedBottomButton:
         button.destroy()
     currentlyDisplayedBottomButton.clear()
     
+def ShortBreakButtonClicked():
+    global isPaused
+    isPaused = False
+    currentTimer[0].ChangeTimerType("s")
+    currentTimer[0].StartTimer()
+    print("Starting")
+    ResetBottomButtons()
+
+
+def LongBreakButtonClicked():
+    return
+    
 def CreateBottomButton():
     global isPaused
     if isPaused == True:
-        buttonStart = customtkinter.CTkButton(currentlyDisplayedMainFrame[0], text="START", font=("Great Vibes", 50), command=StartButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
-        buttonStart.configure(height=125, width=250)
-        buttonStart.pack(side="bottom", pady=(50, 100), padx=90)
+        buttonStart = customtkinter.CTkButton(currentlyDisplayedButtonBottomFrame[0], text="START", font=("Great Vibes", 50), command=StartButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+        buttonStart.configure(height=175, width=250)
+        buttonStart.pack(side="bottom", pady=(20, 40), padx=90, expand=True)
         currentlyDisplayedBottomButton.append(buttonStart)
     else:
-        buttonPause = customtkinter.CTkButton(currentlyDisplayedMainFrame[0], text="PAUSE", font=("Great Vibes", 50), command=PauseButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
-        buttonPause.configure(height=125, width=250)
-        buttonPause.pack(side="bottom", pady=(50, 100), padx=90)
+        buttonPause = customtkinter.CTkButton(currentlyDisplayedButtonBottomFrame[0], text="PAUSE", font=("Great Vibes", 50), command=PauseButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+        buttonPause.configure(height=175, width=250)
+        buttonPause.pack(side="bottom", pady=(50, 40), padx=90)
         currentlyDisplayedBottomButton.append(buttonPause)
+        
+def CreateNestedBottomButtons():
+    
+
+    buttonShortBreak = customtkinter.CTkButton(currentlyDisplayedNestedBottomFrame[0], text="Pomodoro", font=("Great Vibes", 30), command=ShortBreakButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+    buttonShortBreak.configure(height=75, width=200)
+    buttonShortBreak.pack(side="left", pady=(0, 0), padx=(200,40))
+    currentlyDisplayedBottomButton.append(buttonShortBreak)
+    
+    buttonStudy = customtkinter.CTkButton(currentlyDisplayedNestedBottomFrame[0], text="Short Break", font=("Great Vibes", 30), command=ShortBreakButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+    buttonStudy.configure(height=75, width=200)
+    buttonStudy.pack(side="left", pady=(0, 0), padx=(20,40))
+    currentlyDisplayedBottomButton.append(buttonStudy)
+    
+    
+    buttonLongBreak = customtkinter.CTkButton(currentlyDisplayedNestedBottomFrame[0], text="Long Break", font=("Great Vibes", 30), command=LongBreakButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+    buttonLongBreak.configure(height=75, width=200)
+    buttonLongBreak.pack(side="left", pady=(0, 0), padx=20)
+    currentlyDisplayedBottomButton.append(buttonLongBreak)
 
 
 
@@ -364,10 +447,17 @@ def Main():
     CreateRootFrame()
     CreateMainFrame()
     CreateTopMenu()
-    CreateChoiceFrame()
-    CreateBottomButton()
     CreateTimer()
     CreateTimerLabel()
+    CreateMainButtonFrame()
+    CreateBottomButtonFrame()
+    CreateNestedBottomButtonFrame()
+    CreateBottomButton()
+    CreateNestedBottomButtons()
+    CreateChoiceFrame()
+
+
+
     rootFrame[0].mainloop()
 
 if __name__ == "__main__":
