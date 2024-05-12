@@ -1,8 +1,10 @@
 import customtkinter
+from playsound import playsound
 
 rootFrame = []
 currentlyDisplayedMainFrame = []
 currentlyDisplayedTimerLabel = []
+currentlyDisplayedTimerText = []
 currentlyDisplayedTopButtons = []
 currentlyDisplayedButtonTopFrame = []
 currentlyDisplayedButtonBottomFrame = []
@@ -40,18 +42,26 @@ class Timer:
         self.isSetToShortBreakTime = False
     
     def ChangeTimerType(self, timerType:str):
+        self.isPaused= True
+        
         if timerType.lower() == "l":
             self.isSetToLongBreakTime = True
             self.isSetToShortBreakTime = False
             self.isSetToPomodoroTime = False
+            self.ResetAllTimers()
+            self.UpdateLabel()
         elif timerType.lower() =="s":
             self.isSetToShortBreakTime = True
             self.isSetToPomodoroTime = False
             self.isSetToLongBreakTime = False
+            self.ResetAllTimers()
+            self.UpdateLabel()
         else:
             self.isSetToPomodoroTime = True
             self.isSetToLongBreakTime = False
             self.isSetToShortBreakTime = False
+            self.ResetAllTimers()
+            self.UpdateLabel()
             
             
     def StartTimer(self):
@@ -73,6 +83,7 @@ class Timer:
         
     def SetNewShortBreakTime(self, newTime):
         self.maxShortBreakTime = newTime
+        print(self.maxShortBreakTime)
         self.ResetShortBreakTimer()
         self.UpdateLabel()
         
@@ -80,6 +91,11 @@ class Timer:
         self.maxLongBreakTime = newTime
         self.ResetLongBreakTimer()
         self.UpdateLabel()
+        
+    def ResetAllTimers(self):
+        self.ResetLongBreakTimer()
+        self.ResetShortBreakTimer()
+        self.ResetPomodoroTimer()
         
     def ResetPomodoroTimer(self):
         self.currentPomodoroTimeLeft = self.maxPomodoroTime
@@ -118,18 +134,25 @@ class Timer:
                 print("Timer finished.")
 
     def UpdateLabel(self):
+        currentOption = ""
         if self.isSetToShortBreakTime:
             minutes = self.currentShortBreakTimeLeft // 60
             seconds = self.currentShortBreakTimeLeft % 60
+            currentOption = "Short Break Time"
         elif self.isSetToLongBreakTime:
             minutes = self.currentLongBreakTimeLeft // 60
             seconds = self.currentLongBreakTimeLeft % 60
+            currentOption = "Long Break Time"
         else:
             minutes = self.currentPomodoroTimeLeft // 60
             seconds = self.currentPomodoroTimeLeft % 60
-            
+            currentOption = "Pomodoro Time"
+        
+        currentlyDisplayedTimerText[0].configure(text=currentOption)
+        
         timeStr = f"{minutes:02d}:{seconds:02d}"
         currentlyDisplayedTimerLabel[0].configure(text=timeStr)
+        
     
     def ReturnPomodoroTime(self)-> str:
         minutes = self.currentPomodoroTimeLeft // 60
@@ -171,8 +194,13 @@ def CreateMainButtonFrame():
      
 
 def CreateTimerLabel():
+    timerText = customtkinter.CTkLabel(master=currentlyDisplayedMainFrame[0], text="Pomodoro Time", font=("Great Vibes", 40))
+    timerText.pack(padx=(25, 20), pady=(0,5))
     timerLabel = customtkinter.CTkLabel(master=currentlyDisplayedMainFrame[0], text=currentTimer[0].ReturnPomodoroTime(), font=("Great Vibes", 175))
-    timerLabel.pack(padx=(25, 20), pady=(40, 5))
+    timerLabel.pack(padx=(25, 20), pady=(10, 5))
+    
+    currentlyDisplayedTimerText.clear()
+    currentlyDisplayedTimerText.append(timerText)
     currentlyDisplayedTimerLabel.clear()
     currentlyDisplayedTimerLabel.append(timerLabel)
 
@@ -224,12 +252,12 @@ def optionmenu_callback(choice):
             ClearDropdown()
             
         elif isUpdatingLongBreakTime == True:
-            currentTimer[0].SetNewLongBreakTime(300)
+            currentTimer[0].SetNewLongBreakTime(3600)
             ToggleButtonTypeBoolsOff()
             ClearDropdown()
             
         elif isUpdatingShortBreakTime == True:
-            currentTimer[0].SetNewShortBreakTime(300)
+            currentTimer[0].SetNewShortBreakTime(3600)
             ToggleButtonTypeBoolsOff()
             ClearDropdown()
             pass
@@ -242,12 +270,12 @@ def optionmenu_callback(choice):
             ClearDropdown()
             
         elif isUpdatingLongBreakTime == True:
-            currentTimer[0].SetNewLongBreakTime(300)
+            currentTimer[0].SetNewLongBreakTime(2700)
             ToggleButtonTypeBoolsOff()
             ClearDropdown()
             
         elif isUpdatingShortBreakTime == True:
-            currentTimer[0].SetNewShortBreakTime(300)
+            currentTimer[0].SetNewShortBreakTime(2700)
             ToggleButtonTypeBoolsOff()
             ClearDropdown()
             pass
@@ -260,12 +288,12 @@ def optionmenu_callback(choice):
             ClearDropdown()
             
         elif isUpdatingLongBreakTime == True:
-            currentTimer[0].SetNewLongBreakTime(300)
+            currentTimer[0].SetNewLongBreakTime(1800)
             ToggleButtonTypeBoolsOff()
             ClearDropdown()
             
         elif isUpdatingShortBreakTime == True:
-            currentTimer[0].SetNewShortBreakTime(300)
+            currentTimer[0].SetNewShortBreakTime(1800)
             ToggleButtonTypeBoolsOff()
             ClearDropdown()
             pass
@@ -278,12 +306,12 @@ def optionmenu_callback(choice):
             ClearDropdown()
             
         elif isUpdatingLongBreakTime == True:
-            currentTimer[0].SetNewLongBreakTime(300)
+            currentTimer[0].SetNewLongBreakTime(900)
             ToggleButtonTypeBoolsOff()
             ClearDropdown()
             
         elif isUpdatingShortBreakTime == True:
-            currentTimer[0].SetNewShortBreakTime(300)
+            currentTimer[0].SetNewShortBreakTime(900)
             ToggleButtonTypeBoolsOff()
             ClearDropdown()
             pass
@@ -323,19 +351,28 @@ def ToggleButtonTypeBoolsOff():
     isUpdatingPomodorTime = False
 
 def TimeOptionClicked(buttonType:str):
-    global isUpdatingLongBreakTime, isUpdatingPomodorTime, isUpdatingShortBreakTime, isDropDownOpen
+    global isUpdatingLongBreakTime, isUpdatingPomodorTime, isUpdatingShortBreakTime, isDropDownOpen, isPaused
+    
+    playsound('alarm.mp3')
+    
+    
     if isDropDownOpen == True:
         return
     else:
         isDropDownOpen = True
+        isPaused = True
+        currentTimer[0].StopTimer()
         RemoveBottomButtons()
 
         
         if buttonType == "p":
+            currentTimer[0].ChangeTimerType("p")
             isUpdatingPomodorTime = True
         if buttonType =="l":
+            currentTimer[0].ChangeTimerType("l")
             isUpdatingLongBreakTime = True
         if buttonType =="s":
+            currentTimer[0].ChangeTimerType("s")
             isUpdatingShortBreakTime = True
             
         optionMenuVar = customtkinter.StringVar(value="30 Min")
@@ -399,10 +436,20 @@ def RemoveBottomButtons():
     
 def ShortBreakButtonClicked():
     global isPaused
-    isPaused = False
+    isPaused = True
     currentTimer[0].ChangeTimerType("s")
-    currentTimer[0].StartTimer()
-    print("Starting")
+    ResetBottomButtons()
+    
+def PomodoroButtonClicked():
+    global isPaused
+    isPaused = True
+    currentTimer[0].ChangeTimerType("")
+    ResetBottomButtons()
+    
+def LongBreakButtonClicked():
+    global isPaused
+    isPaused = True
+    currentTimer[0].ChangeTimerType("l")
     ResetBottomButtons()
 
 
@@ -425,15 +472,15 @@ def CreateBottomButton():
 def CreateNestedBottomButtons():
     
 
-    buttonShortBreak = customtkinter.CTkButton(currentlyDisplayedNestedBottomFrame[0], text="Pomodoro", font=("Great Vibes", 30), command=ShortBreakButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
-    buttonShortBreak.configure(height=75, width=200)
-    buttonShortBreak.pack(side="left", pady=(0, 0), padx=(200,40))
-    currentlyDisplayedBottomButton.append(buttonShortBreak)
+    buttonPomodoro = customtkinter.CTkButton(currentlyDisplayedNestedBottomFrame[0], text="Pomodoro", font=("Great Vibes", 30), command=PomodoroButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+    buttonPomodoro.configure(height=75, width=200)
+    buttonPomodoro.pack(side="left", pady=(0, 0), padx=(200,40))
+    currentlyDisplayedBottomButton.append(buttonPomodoro)
     
-    buttonStudy = customtkinter.CTkButton(currentlyDisplayedNestedBottomFrame[0], text="Short Break", font=("Great Vibes", 30), command=ShortBreakButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
-    buttonStudy.configure(height=75, width=200)
-    buttonStudy.pack(side="left", pady=(0, 0), padx=(20,40))
-    currentlyDisplayedBottomButton.append(buttonStudy)
+    buttonShortBreak = customtkinter.CTkButton(currentlyDisplayedNestedBottomFrame[0], text="Short Break", font=("Great Vibes", 30), command=ShortBreakButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+    buttonShortBreak.configure(height=75, width=200)
+    buttonShortBreak.pack(side="left", pady=(0, 0), padx=(20,40))
+    currentlyDisplayedBottomButton.append(buttonShortBreak)
     
     
     buttonLongBreak = customtkinter.CTkButton(currentlyDisplayedNestedBottomFrame[0], text="Long Break", font=("Great Vibes", 30), command=LongBreakButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
