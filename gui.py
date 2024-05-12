@@ -1,5 +1,5 @@
 import customtkinter
-from playsound import playsound
+from pygame import mixer
 
 rootFrame = []
 currentlyDisplayedMainFrame = []
@@ -14,6 +14,8 @@ currentlyDisplayedTimeDropdown = []
 currentlyDisplayedNestedBottomFrame = []
 currentlyDisplayedMainButtonFrame = []
 currentTimer = []
+buttonSounds = []
+soundMixer = []
 
 currentPomodorMaxTime = 1800
 currentLongBreakMaxTime = 600
@@ -26,6 +28,9 @@ isDropDownOpen = False
 isUpdatingPomodorTime = False
 isUpdatingLongBreakTime = False
 isUpdatingShortBreakTime = False
+
+
+
 
 class Timer:
     def __init__(self, maxPomodoroTime, maxLongBreakTime, maxShortBreakTime):
@@ -160,7 +165,69 @@ class Timer:
         timeStr = f"{minutes:02d}:{seconds:02d}"
         return timeStr
     
+    def GetCurrentlValue(self)->str:
+        currentValue = ""
+        if self.isSetToShortBreakTime:
+            if self.maxShortBreakTime == 3600:
+                currentValue = "1 Hr"
+                
+            if self.maxShortBreakTime == 2700:
+                currentValue = "45 Min"
+                
+            if self.maxShortBreakTime == 1800:
+                currentValue = "30 Min"
+                
+            if self.maxShortBreakTime == 900:
+                currentValue = "15 Min"
+                
+            if self.maxShortBreakTime == 300:
+                currentValue = "5 Min"
+                
+        elif self.isSetToLongBreakTime:
+            if self.maxLongBreakTime == 3600:
+                currentValue = "1 Hr"
+                
+            if self.maxLongBreakTime == 2700:
+                currentValue = "45 Min"
+                
+            if self.maxLongBreakTime == 1800:
+                currentValue = "30 Min"
+                
+            if self.maxLongBreakTime == 900:
+                currentValue = "15 Min"
+                
+            if self.maxLongBreakTime == 300:
+                currentValue = "5 Min"
+                
+        else:
+            if self.maxPomodoroTime == 3600:
+                currentValue = "1 Hr"
+                
+            if self.maxPomodoroTime == 2700:
+                currentValue = "45 Min"
+                
+            if self.maxPomodoroTime == 1800:
+                currentValue = "30 Min"
+                
+            if self.maxPomodoroTime == 900:
+                currentValue = "15 Min"
+                
+            if self.maxPomodoroTime == 300:
+                currentValue = "5 Min"
+                
+        return currentValue      
+ 
+ 
+def CreateSoundMixer():
+    mixer.init()
+    soundMixer.append(mixer)   
 
+def CreateButtonSounds():
+    buttonSoundOne = soundMixer[0].Sound("Sounds/Buttons/Button1.wav")
+    buttonSoundTwo = soundMixer[0].Sound("Sounds/Buttons/Button2.wav")
+    buttonSounds.append(buttonSoundOne)
+    buttonSounds.append(buttonSoundTwo)
+    
 
 def CreateTimer():
     if not currentTimer:
@@ -353,7 +420,9 @@ def ToggleButtonTypeBoolsOff():
 def TimeOptionClicked(buttonType:str):
     global isUpdatingLongBreakTime, isUpdatingPomodorTime, isUpdatingShortBreakTime, isDropDownOpen, isPaused
     
-    playsound('alarm.mp3')
+
+    buttonSounds[1].play()
+
     
     
     if isDropDownOpen == True:
@@ -375,7 +444,8 @@ def TimeOptionClicked(buttonType:str):
             currentTimer[0].ChangeTimerType("s")
             isUpdatingShortBreakTime = True
             
-        optionMenuVar = customtkinter.StringVar(value="30 Min")
+        currentlySelectedValue = currentTimer[0].GetCurrentlValue()
+        optionMenuVar = customtkinter.StringVar(value=currentlySelectedValue)
         optionMenu = customtkinter.CTkOptionMenu(currentlyDisplayedMainButtonFrame[0],values=["1 Hr","45 Min","30 Min","15 Min","5 Min"],
                                                 command=optionmenu_callback,
                                                 variable=optionMenuVar,
@@ -491,6 +561,8 @@ def CreateNestedBottomButtons():
 
 
 def Main():
+    CreateSoundMixer()
+    CreateButtonSounds()
     CreateRootFrame()
     CreateMainFrame()
     CreateTopMenu()
