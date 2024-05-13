@@ -12,11 +12,19 @@ currentlyDisplayedButtonBottomFrame = []
 currentlyDisplayedBottomButton = []
 currentlyDisplayedChoiceFrame = []
 currentlyDisplayedTimeDropdown = []
+currentlyDisplayedAlarmDropdown = []
+currentlyDisplayedSoundDropdown = []
 currentlyDisplayedNestedBottomFrame = []
 currentlyDisplayedMainButtonFrame = []
+currentAlarmSound = ["Alarm Sound 1"]
+currentButtonSound = ["Button Sound 1"]
 currentTimer = []
 buttonSounds = []
+alarmSounds = []
 soundMixer = []
+
+currentButtonSoundArrayNumber = [0]
+currentAlarmSoundArrayNumber = [0]
 
 currentPomodorMaxTime = 1800
 currentLongBreakMaxTime = 900
@@ -25,6 +33,8 @@ currentShortBreakMaxTime = 300
 isPaused = True
 
 isDropDownOpen = False
+isSoundDropDownOpen = False
+isAlarmDropDownOpen = False
 
 isUpdatingPomodorTime = False
 isUpdatingLongBreakTime = False
@@ -119,7 +129,10 @@ class Timer:
                 self.UpdateLabel()
                 self.timerDelay = rootFrame[0].after(1000, self.PomodoroCountDown)
             else:
-                print("Timer finished.")
+                self.ResetAllTimers()
+                self.UpdateLabel()
+                alarmSounds[currentAlarmSoundArrayNumber[0]].play()
+                
                 
     def ShortBreakCountDown(self):
         if self.isPaused == False:
@@ -128,7 +141,10 @@ class Timer:
                 self.UpdateLabel()
                 self.timerDelay = rootFrame[0].after(1000, self.ShortBreakCountDown)
             else:
-                print("Timer finished.")
+                self.ResetAllTimers()
+                self.UpdateLabel()
+                alarmSounds[currentAlarmSoundArrayNumber[0]].play()
+                
                 
     def LongBreakCountDown(self):
         if self.isPaused == False:
@@ -137,7 +153,9 @@ class Timer:
                 self.UpdateLabel()
                 self.timerDelay = rootFrame[0].after(1000, self.LongBreakCountDown)
             else:
-                print("Timer finished.")
+                self.ResetAllTimers()
+                self.UpdateLabel()
+                alarmSounds[currentAlarmSoundArrayNumber[0]].play()
 
     def UpdateLabel(self):
         currentOption = ""
@@ -226,8 +244,26 @@ def CreateSoundMixer():
 def CreateButtonSounds():
     buttonSoundOne = soundMixer[0].Sound("Sounds/Buttons/Button1.wav")
     buttonSoundTwo = soundMixer[0].Sound("Sounds/Buttons/Button2.wav")
+    buttonSoundThree = soundMixer[0].Sound("Sounds/Buttons/Button3.wav")
+    buttonSoundFour = soundMixer[0].Sound("Sounds/Buttons/Button4.wav")
+    buttonSoundFive = soundMixer[0].Sound("Sounds/Buttons/Button5.wav")
     buttonSounds.append(buttonSoundOne)
     buttonSounds.append(buttonSoundTwo)
+    buttonSounds.append(buttonSoundThree)
+    buttonSounds.append(buttonSoundFour)
+    buttonSounds.append(buttonSoundFive)
+    
+def CreateAlarmSounds():
+    alarmSoundOne = soundMixer[0].Sound("Sounds/Alarms/alarm1.wav")
+    alarmSoundTwo = soundMixer[0].Sound("Sounds/Alarms/alarm2.wav")
+    alarmSoundThree = soundMixer[0].Sound("Sounds/Alarms/alarm3.wav")
+    alarmSoundFour = soundMixer[0].Sound("Sounds/Alarms/alarm4.wav")
+    alarmSoundFive = soundMixer[0].Sound("Sounds/Alarms/alarm5.wav")
+    alarmSounds.append(alarmSoundOne)
+    alarmSounds.append(alarmSoundTwo)
+    alarmSounds.append(alarmSoundThree)
+    alarmSounds.append(alarmSoundFour)
+    alarmSounds.append(alarmSoundFive)
     
 
 def CreateTimer():
@@ -310,7 +346,49 @@ def CreateNestedBottomButtonFrame():
 def ButtonClicked():
     print("Button clicked")
     
-def optionmenu_callback(choice):
+def SoundMenu(choice):
+    print(choice)
+    
+def AlarmMenu(choice):
+    
+    if choice == "Alarm Sound 1":
+        currentAlarmSound.clear()
+        currentAlarmSound.append("Alarm Sound 1")
+        currentAlarmSoundArrayNumber.clear()
+        currentAlarmSoundArrayNumber.append(0)
+        alarmSounds[0].play()
+        
+    if choice =="Alarm Sound 2":
+        currentAlarmSound.clear()
+        currentAlarmSound.append("Alarm Sound 2")
+        currentAlarmSoundArrayNumber.clear()
+        currentAlarmSoundArrayNumber.append(1)
+        alarmSounds[1].play()
+        
+    if choice =="Alarm Sound 3":
+        currentAlarmSound.clear()
+        currentAlarmSound.append("Alarm Sound 3")
+        currentAlarmSoundArrayNumber.clear()
+        currentAlarmSoundArrayNumber.append(2)
+        alarmSounds[2].play()
+        
+    if choice =="Alarm Sound 4":
+        currentAlarmSound.clear()
+        currentAlarmSound.append("Alarm Sound 4")
+        currentAlarmSoundArrayNumber.clear()
+        currentAlarmSoundArrayNumber.append(3)
+        alarmSounds[3].play()
+        
+    if choice =="Alarm Sound 5":
+        currentAlarmSound.clear()
+        currentAlarmSound.append("Alarm Sound 5")
+        currentAlarmSoundArrayNumber.clear()
+        currentAlarmSoundArrayNumber.append(4)
+        alarmSounds[4].play()
+        
+    print(choice)
+    
+def TimerMenu(choice):
     print("optionmenu dropdown clicked:", choice)
     
     if choice =="1 Hr":
@@ -418,10 +496,10 @@ def ToggleButtonTypeBoolsOff():
     isUpdatingPomodorTime = False
 
 def TimeOptionClicked(buttonType:str):
-    global isUpdatingLongBreakTime, isUpdatingPomodorTime, isUpdatingShortBreakTime, isDropDownOpen, isPaused
+    global isUpdatingLongBreakTime, isUpdatingPomodorTime, isUpdatingShortBreakTime, isDropDownOpen, isPaused, isAlarmDropDownOpen, isSoundDropDownOpen
     
     timerType = ""
-    buttonSounds[1].play()
+    buttonSounds[currentButtonSoundArrayNumber[0]].play()
 
     
     
@@ -435,6 +513,12 @@ def TimeOptionClicked(buttonType:str):
         isPaused = True
         currentTimer[0].StopTimer()
         RemoveBottomButtons()
+        
+    if isAlarmDropDownOpen == True:
+        for dropdown in currentlyDisplayedAlarmDropdown:
+            dropdown.destroy()
+        currentlyDisplayedAlarmDropdown.clear()
+        isAlarmDropDownOpen = False
 
     if buttonType == "p":
         timerType = "Pomodoro"
@@ -450,11 +534,11 @@ def TimeOptionClicked(buttonType:str):
         isUpdatingShortBreakTime = True
             
     currentlySelectedValue = currentTimer[0].GetCurrentlValue()
-    optionMenuVar = customtkinter.StringVar(value=currentlySelectedValue)
-    optionsMenuLabel = customtkinter.CTkLabel(currentlyDisplayedMainButtonFrame[0], text=f"Select Time For {timerType}", font=("Great Vibes", 40))
-    optionMenu = customtkinter.CTkOptionMenu(currentlyDisplayedMainButtonFrame[0],values=["1 Hr","45 Min","30 Min","15 Min","5 Min"],
-                                            command=optionmenu_callback,
-                                            variable=optionMenuVar,
+    timerMenuVar = customtkinter.StringVar(value=currentlySelectedValue)
+    timerMenuLabel = customtkinter.CTkLabel(currentlyDisplayedMainButtonFrame[0], text=f"Select Time For {timerType}", font=("Great Vibes", 40))
+    timerMenu = customtkinter.CTkOptionMenu(currentlyDisplayedMainButtonFrame[0],values=["1 Hr","45 Min","30 Min","15 Min","5 Min"],
+                                            command=TimerMenu,
+                                            variable=timerMenuVar,
                                             height= 50,
                                             width = 500,
                                             fg_color="#9d0208",
@@ -465,16 +549,111 @@ def TimeOptionClicked(buttonType:str):
                                             button_hover_color="#370617",
                                             font=("Great Vibes", 50)
     )
-    optionsMenuLabel.pack(side="top", pady=10, padx=90)
-    optionMenu.pack(side="bottom", pady=(20, 0), padx=90)
-    currentlyDisplayedTimeDropdown.append(optionsMenuLabel)
-    currentlyDisplayedTimeDropdown.append(optionMenu)
+    timerMenuLabel.pack(side="top", pady=10, padx=90)
+    timerMenu.pack(side="bottom", pady=(20, 0), padx=90)
+    currentlyDisplayedTimeDropdown.append(timerMenuLabel)
+    currentlyDisplayedTimeDropdown.append(timerMenu)
 
 
 def AlarmButtonClicked():
+    global isSoundDropDownOpen, isDropDownOpen, isAlarmDropDownOpen, isPaused
+    
+    buttonSounds[currentButtonSoundArrayNumber[0]].play()
+
+    
+    
+    if isDropDownOpen == True:
+        for dropdown in currentlyDisplayedTimeDropdown:
+            dropdown.destroy()
+        currentlyDisplayedTimeDropdown.clear()
+        ToggleButtonTypeBoolsOff()
+        isDropDownOpen = False
+        
+    if isSoundDropDownOpen == True:
+        for dropdown in currentlyDisplayedSoundDropdown:
+            dropdown.destroy()
+        currentlyDisplayedSoundDropdown.clear()
+        isSoundDropDownOpen = False
+        
+    if isAlarmDropDownOpen == True:
+        for dropdown in currentlyDisplayedAlarmDropdown:
+            dropdown.destroy()
+        currentlyDisplayedAlarmDropdown.clear()
+        
+    isAlarmDropDownOpen = True
+    isPaused = True
+    currentTimer[0].StopTimer()
+    RemoveBottomButtons()
+
+    alarmMenuVar = customtkinter.StringVar(value=currentAlarmSound[0])
+    alarmMenuLabel = customtkinter.CTkLabel(currentlyDisplayedMainButtonFrame[0], text=f"Select Alarm Sound", font=("Great Vibes", 40))
+    alarmMenu = customtkinter.CTkOptionMenu(currentlyDisplayedMainButtonFrame[0],values=["Alarm Sound 1","Alarm Sound 2","Alarm Sound 3","Alarm Sound 4","Alarm Sound 5"],
+                                            command=AlarmMenu,
+                                            variable=alarmMenuVar,
+                                            height= 50,
+                                            width = 500,
+                                            fg_color="#9d0208",
+                                            dropdown_fg_color="#9d0208",
+                                            dropdown_font=("Great Vibes", 50),
+                                            dropdown_hover_color="#370617",
+                                            button_color="#370617",
+                                            button_hover_color="#370617",
+                                            font=("Great Vibes", 50)
+    )
+    alarmMenuLabel.pack(side="top", pady=10, padx=90)
+    alarmMenu.pack(side="bottom", pady=(20, 0), padx=90)
+    currentlyDisplayedAlarmDropdown.append(alarmMenuLabel)
+    currentlyDisplayedAlarmDropdown.append(alarmMenu)
     return
 
 def SoundButtonClicked():
+    global isSoundDropDownOpen, isDropDownOpen, isAlarmDropDownOpen, isPaused
+    
+    buttonSounds[currentButtonSoundArrayNumber[0]].play()
+
+    if isDropDownOpen == True:
+        for dropdown in currentlyDisplayedTimeDropdown:
+            dropdown.destroy()
+        currentlyDisplayedTimeDropdown.clear()
+        ToggleButtonTypeBoolsOff()
+        isDropDownOpen = False
+        
+        
+    if isAlarmDropDownOpen == True:
+        for dropdown in currentlyDisplayedAlarmDropdown:
+            dropdown.destroy()
+        currentlyDisplayedAlarmDropdown.clear()
+        isAlarmDropDownOpen = False
+        
+    if isSoundDropDownOpen == True:
+        for dropdown in currentlyDisplayedSoundDropdown:
+            dropdown.destroy()
+        currentlyDisplayedSoundDropdown.clear()
+        
+    isSoundDropDownOpen = True
+    isPaused = True
+    currentTimer[0].StopTimer()
+    RemoveBottomButtons()
+
+    soundMenuVar = customtkinter.StringVar(value=currentButtonSound[0])
+    soundMenuLabel = customtkinter.CTkLabel(currentlyDisplayedMainButtonFrame[0], text=f"Select Button Sound", font=("Great Vibes", 40))
+    soundMenu = customtkinter.CTkOptionMenu(currentlyDisplayedMainButtonFrame[0],values=["Button Sound 1","Button Sound 2","Button Sound 3","Button Sound 4","Button Sound 5"],
+                                            command=SoundMenu,
+                                            variable=soundMenuVar,
+                                            height= 50,
+                                            width = 500,
+                                            fg_color="#9d0208",
+                                            dropdown_fg_color="#9d0208",
+                                            dropdown_font=("Great Vibes", 50),
+                                            dropdown_hover_color="#370617",
+                                            button_color="#370617",
+                                            button_hover_color="#370617",
+                                            font=("Great Vibes", 50)
+    )
+    soundMenuLabel.pack(side="top", pady=10, padx=90)
+    soundMenu.pack(side="bottom", pady=(20, 0), padx=90)
+    currentlyDisplayedSoundDropdown.append(soundMenuLabel)
+    currentlyDisplayedSoundDropdown.append(soundMenu)
     return
 
 def CreateTopButtons():
@@ -544,21 +723,21 @@ def ShortBreakButtonClicked():
     isPaused = True
     currentTimer[0].ChangeTimerType("s")
     ResetBottomButtons()
-    buttonSounds[1].play()
+    buttonSounds[currentButtonSoundArrayNumber[0]].play()
     
 def PomodoroButtonClicked():
     global isPaused
     isPaused = True
     currentTimer[0].ChangeTimerType("")
     ResetBottomButtons()
-    buttonSounds[1].play()
+    buttonSounds[currentButtonSoundArrayNumber[0]].play()
     
 def LongBreakButtonClicked():
     global isPaused
     isPaused = True
     currentTimer[0].ChangeTimerType("l")
     ResetBottomButtons()
-    buttonSounds[1].play()
+    buttonSounds[currentButtonSoundArrayNumber[0]].play()
 
 
 
@@ -602,6 +781,7 @@ def CreateNestedBottomButtons():
 def Main():
     CreateSoundMixer()
     CreateButtonSounds()
+    CreateAlarmSounds()
     CreateRootFrame()
     CreateMainFrame()
     CreateTopMenu()
