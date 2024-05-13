@@ -1,4 +1,5 @@
 import customtkinter
+from PIL import Image, ImageTk
 from pygame import mixer
 
 rootFrame = []
@@ -470,22 +471,43 @@ def TimeOptionClicked(buttonType:str):
     currentlyDisplayedTimeDropdown.append(optionMenu)
 
 
+def AlarmButtonClicked():
+    return
+
+def SoundButtonClicked():
+    return
+
 def CreateTopButtons():
-    buttonPomodoro = customtkinter.CTkButton(currentlyDisplayedButtonTopFrame[0], text="Pomodoro", font=("Great Vibes", 30), command=lambda option="p":TimeOptionClicked(option), border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+    buttonPomodoro = customtkinter.CTkButton(currentlyDisplayedButtonTopFrame[0], text_color="white", text="Pomodoro", font=("Great Vibes", 30), command=lambda option="p":TimeOptionClicked(option), border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
     buttonPomodoro.configure(height=75, width=200)
-    buttonPomodoro.pack(side="left", pady=12, padx=(270, 40))
+    buttonPomodoro.pack(side="left", pady=12, padx=(260, 40))
     
-    buttonLongBreak = customtkinter.CTkButton(currentlyDisplayedButtonTopFrame[0], text="Long Break", font=("Great Vibes", 30), command=lambda option="l":TimeOptionClicked(option), border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+    buttonLongBreak = customtkinter.CTkButton(currentlyDisplayedButtonTopFrame[0], text_color="white", text="Long Break", font=("Great Vibes", 30), command=lambda option="l":TimeOptionClicked(option), border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
     buttonLongBreak.configure(height=75, width=200)
     buttonLongBreak.pack(side="left", pady=12, padx=20)
     
-    buttonShortBreak = customtkinter.CTkButton(currentlyDisplayedButtonTopFrame[0], text="Short Break", font=("Great Vibes", 30), command=lambda option="s":TimeOptionClicked(option), border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+    buttonShortBreak = customtkinter.CTkButton(currentlyDisplayedButtonTopFrame[0], text_color="white", text="Short Break", font=("Great Vibes", 30), command=lambda option="s":TimeOptionClicked(option), border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
     buttonShortBreak.configure(height=75, width=200)
-    buttonShortBreak.pack(side="left", pady=12, padx=(20, 40))
+    buttonShortBreak.pack(side="left", pady=12, padx=(40, 40))
+    
+    alarmImage = customtkinter.CTkImage(Image.open("Imgs/alarm.png"), size=(30, 30))
+    soundImage = customtkinter.CTkImage(Image.open("Imgs/sound.png"), size=(30, 30))
+    
+    alarmButton = customtkinter.CTkButton(master=currentlyDisplayedButtonTopFrame[0], text="",image=alarmImage, fg_color="#9d0208", hover_color="#370617", command=AlarmButtonClicked, border_color="#370617", border_width=3)
+    alarmButton.configure(height=50, width=50)
+    alarmButton.pack(side="left", pady=(0,0), padx=(20,20))
+    
+    soundButton = customtkinter.CTkButton(master=currentlyDisplayedButtonTopFrame[0], text="",image=soundImage, fg_color="#9d0208", hover_color="#370617", command=SoundButtonClicked, border_color="#370617", border_width=3)
+    soundButton.configure(height=50, width=50)
+    soundButton.pack(side="left", pady=(0,0), padx=(10,40))
 
+    currentlyDisplayedTopButtons.append(alarmButton)
+    currentlyDisplayedTopButtons.append(soundButton)
     currentlyDisplayedTopButtons.append(buttonPomodoro)
     currentlyDisplayedTopButtons.append(buttonShortBreak)
     currentlyDisplayedTopButtons.append(buttonLongBreak)
+    
+    
     
 def StartButtonClicked():
     global isPaused
@@ -544,31 +566,31 @@ def LongBreakButtonClicked():
 def CreateBottomButton():
     global isPaused
     if isPaused == True:
-        buttonStart = customtkinter.CTkButton(currentlyDisplayedButtonBottomFrame[0], text="START", font=("Great Vibes", 50), command=StartButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+        buttonStart = customtkinter.CTkButton(currentlyDisplayedButtonBottomFrame[0], text_color="white", text="START", font=("Great Vibes", 50), command=StartButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
         buttonStart.configure(height=175, width=250)
         buttonStart.pack(side="bottom", pady=(20, 40), padx=90, expand=True)
         currentlyDisplayedBottomButton.append(buttonStart)
     else:
-        buttonPause = customtkinter.CTkButton(currentlyDisplayedButtonBottomFrame[0], text="PAUSE", font=("Great Vibes", 50), command=PauseButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+        buttonPause = customtkinter.CTkButton(currentlyDisplayedButtonBottomFrame[0], text_color="white", text="PAUSE", font=("Great Vibes", 50), command=PauseButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
         buttonPause.configure(height=175, width=250)
-        buttonPause.pack(side="bottom", pady=(50, 40), padx=90)
+        buttonPause.pack(side="bottom", pady=(20, 40), padx=90)
         currentlyDisplayedBottomButton.append(buttonPause)
         
 def CreateNestedBottomButtons():
     
 
-    buttonPomodoro = customtkinter.CTkButton(currentlyDisplayedNestedBottomFrame[0], text="Pomodoro", font=("Great Vibes", 30), command=PomodoroButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+    buttonPomodoro = customtkinter.CTkButton(currentlyDisplayedNestedBottomFrame[0], text_color="white", text="Pomodoro", font=("Great Vibes", 30), command=PomodoroButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
     buttonPomodoro.configure(height=75, width=200)
     buttonPomodoro.pack(side="left", pady=(0, 0), padx=(200,40))
     currentlyDisplayedBottomButton.append(buttonPomodoro)
     
-    buttonLongBreak = customtkinter.CTkButton(currentlyDisplayedNestedBottomFrame[0], text="Long Break", font=("Great Vibes", 30), command=LongBreakButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+    buttonLongBreak = customtkinter.CTkButton(currentlyDisplayedNestedBottomFrame[0], text_color="white", text="Long Break", font=("Great Vibes", 30), command=LongBreakButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
     buttonLongBreak.configure(height=75, width=200)
     buttonLongBreak.pack(side="left", pady=(0, 0), padx=20)
     currentlyDisplayedBottomButton.append(buttonLongBreak)
 
     
-    buttonShortBreak = customtkinter.CTkButton(currentlyDisplayedNestedBottomFrame[0], text="Short Break", font=("Great Vibes", 30), command=ShortBreakButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
+    buttonShortBreak = customtkinter.CTkButton(currentlyDisplayedNestedBottomFrame[0], text_color="white", text="Short Break", font=("Great Vibes", 30), command=ShortBreakButtonClicked, border_color="#370617", border_width=3, fg_color="#9d0208", hover_color="#370617", corner_radius=10)
     buttonShortBreak.configure(height=75, width=200)
     buttonShortBreak.pack(side="left", pady=(0, 0), padx=(20,40))
     currentlyDisplayedBottomButton.append(buttonShortBreak)
